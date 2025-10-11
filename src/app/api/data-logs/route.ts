@@ -1,9 +1,11 @@
 import dbConnect from "@/lib/dbConnect";
+import ImportLogModel from "@/models/ImportLog";
+import JobModel from "@/models/Job";
 import axios from "axios";
 import { XMLParser } from "fast-xml-parser";
 
 export async function POST(request: Request) {
-    // await dbConnect();
+    await dbConnect();
 
     try {
         const apiResponse = await axios.get(process.env.JOBLIST_API_URI!, {
@@ -40,13 +42,55 @@ export async function POST(request: Request) {
             );
         }
 
-        
+        const LogExist = await ImportLogModel.findOne({ timestamp: channel.lastBuildDate })
+        // console.log(channel.lastBuildDate);
+        if (!LogExist) {
+            let newJobs: number = 0;
+            let updatedJobs: number = 0;
+            let failedJobs: string[] = []
+            for (const item of channel.item) {
+                try {
+                    const exists = await JobModel.findOne({ externalId: item.id });
+
+                    if (exists) {
+                        updatedJobs += 1
+                    } else {
+                        newJobs += 1
+                    }
+
+                    const newJob = new JobModel({
+                        externalId: item.id,
+                        title: item.title,
+                        company: item.company,
+                        location: item.location,
+                        description: item.description,
+                        type: item.job_type,
+                        url: item.link,
+                        postedAt: item.pubDate
+                    });
+                    await newJob.save();
+                } catch (error: any) {
+                    // failedJobs.push(error.message)
+                    // console.log(error.message);
+                }
+            }
+            const newLog = new ImportLogModel({
+                source: channel.link[0]["@_href"],
+                timestamp: channel.lastBuildDate,
+                totalFetched: channel.item.length,
+                newJobs,
+                updatedJobs,
+                failedJobs
+            })
+            await newLog.save()
+        }
+
 
         return Response.json(
             {
                 success: true,
                 timestamp: channel.lastBuildDate,
-                data: channel.item,
+                data: channel,
             },
             { status: 200 }
         );

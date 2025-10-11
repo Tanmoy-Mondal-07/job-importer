@@ -3,10 +3,8 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface ImportLog extends Document {
     source: string;
-    fileName: string;
-    timestamp: Date;
+    timestamp: string;
     totalFetched: number;
-    totalImported: number;
     newJobs: number;
     updatedJobs: number;
     failedJobs: string[];
@@ -18,19 +16,11 @@ const importLogSchema: Schema<ImportLog> = new Schema(
             type: String,
             required: true
         },
-        fileName: {
+        timestamp: {
             type: String,
             required: true
         },
-        timestamp: {
-            type: Date,
-            default: Date.now
-        },
         totalFetched: {
-            type: Number,
-            default: 0
-        },
-        totalImported: {
             type: Number,
             default: 0
         },
