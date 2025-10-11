@@ -40,11 +40,13 @@ export async function POST(request: Request) {
             );
         }
 
+        
+
         return Response.json(
             {
                 success: true,
+                timestamp: channel.lastBuildDate,
                 data: channel.item,
-                timestamp:channel.lastBuildDate
             },
             { status: 200 }
         );
