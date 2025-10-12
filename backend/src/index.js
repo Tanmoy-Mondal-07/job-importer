@@ -4,6 +4,7 @@ const { connectMongo } = require('./db');
 const { pushFeedToQueue } = require('./producer');
 const { jobQueue } = require('./queue');
 const ImportLog = require('./models/ImportLog');
+const cron = require("node-cron");
 
 const PORT = process.env.PORT || 4000;
 
@@ -12,6 +13,87 @@ async function startServer() {
 
     const app = express();
     app.use(express.json());
+
+    cron.schedule("*/5 * * * *", async () => {
+        try {
+            const feeds = process.env.FEEDS?.split(",") || [];
+            console.log(`running scheduled import for ${feeds.length} feeds`);
+            for (const feedUrl of feeds) {
+
+                const start = Date.now();
+                const pushRes = await pushFeedToQueue(feedUrl);
+                const jobIds = pushRes.pushed;
+                const totalFetched = pushRes.total || jobIds.length;
+
+                console.log(` Added ${jobIds.length} jobs to queue for ${feedUrl}`);
+
+                const results = {
+                    totalFetched,
+                    totalImported: 0,
+                    newJobs: 0,
+                    updatedJobs: 0,
+                    failedJobs: [],
+                };
+
+                //bull queue
+                const pollInterval = 2000;
+                let remaining = new Set(jobIds);
+                let maxWaitMs = 1000 * 60 * 2;
+                const started = Date.now();
+
+                while (remaining.size > 0 && Date.now() - started < maxWaitMs) {
+                    for (const id of [...remaining]) {
+                        const job = await jobQueue.getJob(id);
+                        if (!job) {
+                            remaining.delete(id);
+                            continue;
+                        }
+                        if (await job.isCompleted()) {
+                            const r = await job.returnvalue;
+                            results.totalImported += 1;
+                            if (r?.result === "inserted") results.newJobs += 1;
+                            else if (r?.result === "updated") results.updatedJobs += 1;
+                            remaining.delete(id);
+                        } else if (await job.isFailed()) {
+                            const err = await job.failedReason;
+                            results.failedJobs.push({ item: null, reason: err });
+                            remaining.delete(id);
+                        }
+                    }
+                    if (remaining.size > 0) {
+                        console.log(`:: Waiting for ${remaining.size} jobs...`);
+                        await new Promise((r) => setTimeout(r, pollInterval));
+                    }
+                }
+
+                //timed out if stuck
+                if (remaining.size > 0) {
+                    console.log(`${remaining.size} jobs timed out`);
+                    for (const id of remaining) {
+                        results.failedJobs.push({ item: null, reason: "timeout" });
+                    }
+                }
+
+                const durationMs = Date.now() - start;
+                const importLog = await ImportLog.create({
+                    feedUrl,
+                    fileName: feedUrl,
+                    timestamp: new Date(),
+                    totalFetched: results.totalFetched,
+                    totalImported: results.totalImported,
+                    newJobs: results.newJobs,
+                    updatedJobs: results.updatedJobs,
+                    failedJobs: results.failedJobs,
+                    durationMs,
+                });
+
+                console.log(`Added ${pushRes.total} jobs for feed ${feedUrl}`);
+            }
+            console.log("scheduled import triggered successfully");
+        } catch (err) {
+            console.error("Error in scheduled import:", err);
+        }
+    });
 
     //is the server running
     app.get('/', (req, res) => res.send('Job importer running'));
