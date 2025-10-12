@@ -14,7 +14,7 @@ async function startServer() {
     const app = express();
     app.use(express.json());
 
-    cron.schedule("*/5 * * * *", async () => {
+    cron.schedule("0 * * * *", async () => {
         try {
             const feeds = process.env.FEEDS?.split(",") || [];
             console.log(`running scheduled import for ${feeds.length} feeds`);
