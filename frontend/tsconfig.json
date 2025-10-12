@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/data-logs", "Node-worker-server/workers/addRepeatJob.js", "Node-worker-server/workers/myWorker.js", "Node-worker-server/lib/redis.js", "Node-worker-server/lib/queue.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
