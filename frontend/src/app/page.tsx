@@ -53,7 +53,7 @@ export default function DataList() {
   return (
     <div className="rounded-2xl border border-gray-200 shadow-sm overflow-hidden bg-white">
 
-      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {isLoading && <Loader2 className="mr-20 h-25 w-25 animate-spin" />}
       {!!error && <h1 className="text-red-600">{error}</h1>}
 
       <Table>
