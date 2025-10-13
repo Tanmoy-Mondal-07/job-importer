@@ -1,4 +1,4 @@
-## 🏗️ Folder Structure
+## Folder Structure
 
 ```sh
 └── job-importer.git/
@@ -49,6 +49,47 @@
 ```
 
 
+# Frontend
+
+## Tech Stack
+
+- **Framework:** Next.js  
+- **Language:** TypeScript  
+- **UI Library:** ShadCN UI  
+- **HTTP Client:** Axios  
+- **Database:** MongoDB (via Mongoose)
+
+## Setup Instructions
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/Tanmoy-Mondal-07/job-importer.git
+cd frontend
+````
+
+2. **Install dependencies**
+
+```bash
+npm install
+```
+
+3. **Create environment variables**
+
+Create a `.env` file in the `frontend` directory and add your MongoDB connection URL:
+
+```env
+MONGODB_URI=<your-mongodb-connection-url>
+```
+
+4. **Run the development server**
+
+```bash
+npm run dev
+```
+
+The frontend will start at [http://localhost:3000](http://localhost:3000)
+
 ---
 
 # Backend (Node.js + Redis + Bull + MongoDB)
@@ -81,25 +122,57 @@
 
 ---
 
-## 🔧 Installation & Setup
+## Setup Instructions
 
-### Install and Run Backend Server
+1. **Clone the repository**
+
 ```bash
 git clone https://github.com/Tanmoy-Mondal-07/job-importer.git
-
 cd backend
-npm i
+````
 
-Start Redis locally using Docker:
+2. **Install dependencies**
+
+```bash
+npm install
+```
+
+3. **Create environment variables**
+
+Create a `.env` file in the `backend` directory
+
+```env
+MONGO_URI=<your-mongodb-connection-url>
+
+REDIS_HOST=
+REDIS_PORT=
+REDIS_PASSWORD=
+
+QUEUE_NAME=
+WORKER_CONCURRENCY=5
+BATCH_SIZE=100
+
+FEEDS="",""
+
+PORT=""
+```
+
+4. **Start Redis locally using Docker**
+
+```bash
 docker run -d -p 6379:6379 redis
+```
 
-Run the app
-npm run start
-
-(in a separate terminal)
-Start the Bull worker
+5. **Start the Bull worker**
+```bash
 npm run worker
 ```
+5. **Run the development server(in a separate terminal)**
+
+```bash
+npm run start
+```
+
 ## Automatic import
 ### The app automatically runs every 1h using node-cron.
 

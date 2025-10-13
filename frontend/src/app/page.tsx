@@ -1,12 +1,19 @@
 "use client"
 
 import {
-  Table, TableBody, 
+  Table, TableBody,
   TableCaption, TableCell,
-  TableHead, TableHeader, 
+  TableHead, TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
 import { useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
 import axios from "axios"
@@ -51,7 +58,7 @@ export default function DataList() {
 
       <Table>
         <TableCaption className="text-gray-600 text-sm py-4">
-          Click On The Row for Error Details
+          Click On The Error No for Error Details
         </TableCaption>
 
         <TableHeader>
@@ -87,9 +94,28 @@ export default function DataList() {
                 {log.updatedJobs}
               </TableCell>
 
-              <TableCell className={(log.failedJobs.length != 0) ? "bg-red-900 text-center text-white" : "text-center text-gray-700"}>
-                {log.failedJobs.length}
-              </TableCell>
+              <Drawer>
+
+                <TableCell className="text-center p-0">
+                  <DrawerTrigger className={(log.failedJobs.length != 0) ? "bg-red-900 text-center text-white hover:cursor-pointer w-10" : "text-center text-gray-700"}>
+                    {log.failedJobs.length}
+                  </DrawerTrigger>
+                </TableCell>
+
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Error logs</DrawerTitle>
+
+                    {log.failedJobs.map((errorslog: any) => (
+                      <DrawerDescription key={errorslog._id}>
+                        {errorslog.reason}
+                      </DrawerDescription>
+                    ))}
+
+                  </DrawerHeader>
+                </DrawerContent>
+
+              </Drawer>
 
             </TableRow>
           ))}
