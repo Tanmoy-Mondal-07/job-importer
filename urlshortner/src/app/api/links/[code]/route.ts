@@ -2,7 +2,7 @@ import appwriteURLService from '@/appwrite/uriConfig'
 import { URI } from '@/types/URLResponse';
 import getDomain from '@/util/domainName';
 
-export async function GET(request: Request, context: { params: Promise<{ code: string }> }) {
+export async function GET(request: Request, context: { params: { code: string } }) {
 
     try {
         const domain = getDomain()
@@ -43,7 +43,7 @@ export async function GET(request: Request, context: { params: Promise<{ code: s
     }
 }
 
-export async function DELETE(request: Request, context: { params: Promise<{ code: string }> }) {
+export async function DELETE(request: Request, context: { params: { code: string } }) {
 
     try {
 
