@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/conf/conf.js"  ],
+, "src/conf/conf.js", "src/app/api/clickCount/[id]/route.ts"  ],
   "exclude": ["node_modules"]
 }
