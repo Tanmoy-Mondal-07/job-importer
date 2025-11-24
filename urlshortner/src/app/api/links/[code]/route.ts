@@ -2,11 +2,11 @@ import appwriteURLService from '@/appwrite/uriConfig'
 import { URI } from '@/types/URLResponse';
 import getDomain from '@/util/domainName';
 
-export async function GET(request: Request, context: { params: Promise<{ code: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
 
     try {
         const domain = getDomain()
-        const { code } = await context.params;
+        const { code } = await params;
         // console.log(code);
 
         if (!code) {
@@ -43,11 +43,11 @@ export async function GET(request: Request, context: { params: Promise<{ code: s
     }
 }
 
-export async function DELETE(request: Request, context: { params: Promise<{ code: string }> }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ code: string }> }) {
 
     try {
 
-        const { code } = await context.params;
+        const { code } = await params;
         // console.log(code);
 
         if (!code) {

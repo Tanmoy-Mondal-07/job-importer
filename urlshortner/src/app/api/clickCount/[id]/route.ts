@@ -1,11 +1,11 @@
 import appwriteURLService from '@/appwrite/uriConfig'
 import { URI } from '@/types/URLResponse';
 
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 
     try {
 
-        const { id } = await context.params;
+        const { id } = await params;
         // console.log(code);
 
         if (!id) {
